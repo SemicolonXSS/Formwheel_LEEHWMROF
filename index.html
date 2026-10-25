@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LEEHWMROF — Mirror World</title><style>
+:root{font-family:system-ui,sans-serif;color:#f4efff;background:#100d1b}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#35204c,#100d1b 65%);min-height:100vh}main{max-width:780px;margin:auto;padding:32px 18px}header{display:flex;justify-content:space-between;align-items:center}small,.muted{color:#b9aacd}h1{font-size:clamp(2rem,8vw,4rem);letter-spacing:.08em;margin:38px 0 8px}h2{margin:0 0 12px}.panel{background:#211b31;border:1px solid #60447b;border-radius:20px;padding:22px;margin:22px 0;box-shadow:0 12px 32px #0003}button{background:#a971ff;color:#140b20;border:0;border-radius:12px;padding:13px 18px;font:inherit;font-weight:700;cursor:pointer;margin:5px 6px 5px 0}button:hover,button:focus-visible{background:#ffc16c;outline:2px solid #fff}button.secondary{background:#423251;color:#fff}.choices{display:grid;gap:8px}.choices button{text-align:left}.tag{color:#ffbe70}.hidden{display:none}.progress{height:8px;border-radius:10px;background:#493753;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,#ffaf64,#b376ff);transition:width .3s}footer{color:#a79bb6;font-size:.8rem;margin-top:38px}#log{white-space:pre-wrap;line-height:1.8}a{color:#ffca88}</style></head><body><main>
+<header><strong>◉ LEEHWMROF</strong><small>ENTITY-003 / REVERSE</small></header>
+<h1>LEEHWMROF</h1><p class="muted">Formwheel의 반대편. 웃음 뒤에 숨은 진실.</p>
+<section class="panel" id="gate"><h2>🪞 숨겨진 입구</h2><p>이 세계는 초대받지 않은 방문자를 기다리지 않는다.</p><button id="mirror">거울을 조사한다</button><p id="hint" class="muted" aria-live="polite"></p><div id="unlock" class="hidden"><label for="code">거울에 나타난 단어를 입력하세요</label><p><input id="code" autocomplete="off" style="font:inherit;padding:12px;border-radius:10px;width:100%;max-width:300px" placeholder="??????"></p><button id="enter">입장</button></div></section>
+<section class="panel hidden" id="game"><small id="chapter"></small><h2 id="heading"></h2><p id="story"></p><div class="progress"><div class="bar" id="bar"></div></div><div class="choices" id="choices"></div><p class="tag" id="feedback" aria-live="polite"></p></section>
+<section class="panel hidden" id="archive"><h2>📁 발견한 기록</h2><div id="log"></div><button class="secondary" id="reset">처음부터 다시</button></section>
+<footer>독립형 스토리 프로토타입 · 원본 Formwheel 및 Firebase 데이터를 변경하지 않습니다.</footer>
+</main><script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const chapters=[
+{title:'REVERSE PLAZA',text:'반가워! 이곳에서는 정답이 오답이고, 오답이 정답이야. 어느 문을 열래?',options:[['정답이라고 쓰인 문','정답이라고 쓰인 문은 잠겨 있었다.'],['오답이라고 쓰인 문','반전 규칙을 알아냈다!'],['둘 다 두드린다','문 두 개가 동시에 열렸다.']]},
+{title:'GLITCH CORRIDOR',text:'REVERSE: “NULL은 나를 만들었어. 하지만 내 선택까지 만들진 않았지.” 무엇을 말할까?',options:[['넌 자유롭게 선택할 수 있어','REVERSE가 자유를 처음으로 이해한다.'],['원래 세계로 돌아가자','REVERSE는 원래 세계를 관찰하기 시작한다.'],['왜 규칙을 뒤집었어?','REVERSE: “내가 할 수 있는 유일한 일이었으니까.”']]},
+{title:'LOST ARCHIVE',text:'REVERSE: “자유를 얻으려면 원본을 대체해야 할까?” 복제된 Hub가 빛난다.',options:[['원본을 덮어써','REVERSE는 교체 계획의 위험성을 깨닫는다.'],['두 세계는 공존할 수 있어','REVERSE는 공존이라는 선택지를 발견한다.'],['기록부터 확인하자','오래된 기록에 NULL의 실험 목적이 남아 있다.']]},
+{title:'ORIGIN CORE',text:'REVERSE: “내 세계에도 나를 믿는 존재들이 생겼어. 이제 무엇을 지켜야 할까?”',options:[['네 세계의 존재들을 지켜','REVERSE는 보호를 선택했다.'],['두 세계 모두 지켜','REVERSE는 공존과 보호를 선택했다.'],['NULL과 대화해','REVERSE는 대화를 통한 보호를 선택했다.']]}
+];
+const phase=['A · 자유','B · 교체','C · 보호'];let step=0,records=[],visits=0;
+$('mirror').onclick=()=>{visits++;$('hint').textContent=visits===1?'거울에 거꾸로 쓰인 이름이 보인다…': 'FORMWHEEL을 뒤집으면?';$('unlock').classList.remove('hidden')};
+$('enter').onclick=()=>{if($('code').value.trim().toLowerCase()!=='leehwmrof'){$('hint').textContent='이름을 거꾸로 읽어 보세요.';return}$('gate').classList.add('hidden');$('game').classList.remove('hidden');render()};
+function render(){const c=chapters[step];$('chapter').textContent='CHAPTER '+(step+1)+' / '+chapters.length+' · 목적 '+phase[step===0?0:step===1?0:step===2?1:2];$('heading').textContent=c.title;$('story').textContent=c.text;$('bar').style.width=(step/chapters.length*100)+'%';$('feedback').textContent='';$('choices').replaceChildren();c.options.forEach(([label,outcome],i)=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>choose(i,outcome);$('choices').append(b)})}
+function choose(i,outcome){records.push('CH'+(step+1)+': '+outcome);$('feedback').textContent=outcome;step++;if(step<chapters.length){setTimeout(render,450)}else{setTimeout(finish,450)}}
+function finish(){$('game').classList.add('hidden');$('archive').classList.remove('hidden');$('log').textContent=records.join('\n\n')+'\n\nENTITY-003: 자유를 원했고, 교체를 고민했으며, 결국 보호를 선택했다.\n\n[END OF PROTOTYPE]'}
+$('reset').onclick=()=>{step=0;records=[];$('archive').classList.add('hidden');$('game').classList.remove('hidden');render()}
+})();
+</script></body></html>
