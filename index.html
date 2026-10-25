@@ -23,6 +23,6 @@ $('enter').onclick=()=>{if($('code').value.trim().toLowerCase()!=='leehwmrof'){$
 function render(){const c=chapters[step];$('chapter').textContent='CHAPTER '+(step+1)+' / '+chapters.length+' · 목적 '+phase[step===0?0:step===1?0:step===2?1:2];$('heading').textContent=c.title;$('story').textContent=c.text;$('bar').style.width=(step/chapters.length*100)+'%';$('feedback').textContent='';$('choices').replaceChildren();c.options.forEach(([label,outcome],i)=>{const b=document.createElement('button');b.textContent=label;b.onclick=()=>choose(i,outcome);$('choices').append(b)})}
 function choose(i,outcome){records.push('CH'+(step+1)+': '+outcome);$('feedback').textContent=outcome;step++;if(step<chapters.length){setTimeout(render,450)}else{setTimeout(finish,450)}}
 function finish(){$('game').classList.add('hidden');$('archive').classList.remove('hidden');$('log').textContent=records.join('\n\n')+'\n\nENTITY-003: 자유를 원했고, 교체를 고민했으며, 결국 보호를 선택했다.\n\n[END OF PROTOTYPE]'}
-$('reset').onclick=()=>{step=0;records=[];$('archive').classList.add('hidden');$('game').classList.remove('hidden');render()}
+if(new URLSearchParams(location.search).get('reverse')==='1'){$('gate').classList.add('hidden');$('game').classList.remove('hidden');render();}\n$('reset').onclick=()=>{step=0;records=[];$('archive').classList.add('hidden');$('game').classList.remove('hidden');render()}
 })();
 </script></body></html>
